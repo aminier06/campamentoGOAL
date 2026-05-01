@@ -629,7 +629,7 @@ function enviarDatos(payload) {
     body: formData
   })
   .then(() => {
-    mostrarMensaje("Información enviada. Verifique el registro en la hoja de cálculo.", "ok");
+    mostrarMensaje("Información enviada correctamente.", "ok");
     reiniciarFormulario();
   })
   .catch(error => {
