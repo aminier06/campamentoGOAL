@@ -23,6 +23,393 @@ body {
 }
 
 h1 {
-  text-align: center;
   color: #0d6efd;
-  margin-bottom: 8px
+  text-align: center;
+}
+
+h2, h3 {
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+h3 {
+  color: #0d6efd;
+  border-bottom: 2px solid #e9ecef;
+  padding-bottom: 5px;
+}
+
+.subtitulo {
+  text-align: center;
+  color: #555;
+  margin-bottom: 25px;
+}
+
+.seccion {
+  border-left: 5px solid #0d6efd;
+  padding: 18px;
+  margin-top: 20px;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+label {
+  display: block;
+  margin-top: 12px;
+  font-weight: bold;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  box-sizing: border-box;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 2px rgba(13,110,253,0.15);
+  outline: none;
+}
+
+.persona {
+  border: 1px solid #dee2e6;
+  background: #ffffff;
+  padding: 14px;
+  margin-top: 14px;
+  border-radius: 8px;
+}
+
+.persona h4 {
+  margin-top: 0;
+  color: #198754;
+}
+
+button {
+  margin-top: 15px;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-enviar {
+  background: linear-gradient(135deg, #198754, #157347);
+  color: white;
+  width: 100%;
+  font-size: 17px;
+  padding: 14px;
+}
+
+.btn-enviar:disabled {
+  background: #999;
+  cursor: not-allowed;
+}
+
+.mensaje {
+  margin-top: 18px;
+  padding: 12px;
+  border-radius: 6px;
+  display: none;
+  font-weight: bold;
+}
+
+.mensaje.ok {
+  display: block;
+  background: #d1e7dd;
+  color: #0f5132;
+  border: 1px solid #badbcc;
+}
+
+.mensaje.error {
+  display: block;
+  background: #f8d7da;
+  color: #842029;
+  border: 1px solid #f5c2c7;
+}
+
+.footer {
+  text-align: center;
+  margin-top: 30px;
+  padding: 15px;
+  font-size: 13px;
+  color: #666;
+  border-top: 1px solid #ddd;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Campamento GOAL</h1>
+<h2>Registro de sede, coordinador, facilitadores y colaboradores</h2>
+<p class="subtitulo">Formulario oficial para el registro por distrito educativo</p>
+
+<form id="formulario">
+
+<div class="seccion">
+  <h3>Datos generales</h3>
+
+  <label>Regional</label>
+  <select id="regional" required>
+    <option value="">Seleccione una regional</option>
+  </select>
+
+  <label>Distrito Educativo</label>
+  <select id="distrito" required disabled>
+    <option value="">Seleccione primero una regional</option>
+  </select>
+
+  <label>Nombre de quien completa el formulario</label>
+  <input type="text" id="responsable" required>
+
+  <label>Teléfono de contacto</label>
+  <input type="tel" id="telefono" required>
+
+  <label>Correo electrónico</label>
+  <input type="email" id="correo" required>
+</div>
+
+<div class="seccion">
+  <h3>Sede del campamento</h3>
+
+  <label>Nombre del centro sede</label>
+  <input type="text" id="sede1Centro" required>
+</div>
+
+<div class="seccion">
+  <h3>Coordinador de sede</h3>
+
+  <label>Nombre del coordinador</label>
+  <input type="text" id="sede1CoordNombre" required>
+
+  <label>Cédula del coordinador</label>
+  <input type="text" id="sede1CoordCedula" required placeholder="000-0000000-0">
+
+  <label>Teléfono del coordinador</label>
+  <input type="tel" id="sede1CoordTelefono" required>
+</div>
+
+<div class="seccion">
+  <h3>Facilitadores</h3>
+
+  <div id="facilitadores_sede1"></div>
+</div>
+
+<div class="seccion">
+  <h3>Colaboradores</h3>
+
+  <div id="colaboradores_sede1"></div>
+</div>
+
+<div class="seccion">
+  <h3>Observaciones</h3>
+  <label>Observaciones o necesidades identificadas</label>
+  <textarea id="observaciones" rows="4"></textarea>
+</div>
+
+<button type="submit" id="btnEnviar" class="btn-enviar">
+  Enviar información
+</button>
+
+<div id="mensaje" class="mensaje"></div>
+
+</form>
+
+<footer class="footer">
+  © <span id="year"></span> Aneudy Minier | Campamento GOAL
+</footer>
+
+</div>
+
+<script>
+const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbyEbuDKCYWseRw_LtY8651Z4ivLhCm4kpkn485tuVo1sFksytLUmFvfo5Bqf6zBlMln5A/exec";
+
+const catalogoDistritos = {
+  "01 - BARAHONA": ["0101 - PEDERNALES","0102 - ENRIQUILLO","0103 - BARAHONA","0104 - CABRAL","0105 - VICENTE NOBLE"],
+  "02 - SAN JUAN DE LA MAGUANA": ["0201 - COMENDADOR","0202 - PEDRO SANTANA","0203 - LAS MATAS DE FARFAN","0204 - EL CERCADO","0205 - SAN JUAN ESTE","0206 - SAN JUAN OESTE","0207 - HONDO VALLE"],
+  "03 - AZUA": ["0301 - AZUA","0302 - PADRE DE LAS CASAS","0303 - SAN JOSE DE OCOA","0304 - BANI","0305 - NIZAO"],
+  "04 - SAN CRISTOBAL": ["0401 - CAMBITA GARABITOS","0402 - SAN CRISTOBAL NORTE","0403 - SAN CRISTOBAL SUR","0404 - VILLA ALTAGRACIA","0405 - YAGUATE","0406 - HAINA","0407 - SAN GREGORIO DE NIGUA"],
+  "05 - SAN PEDRO DE MACORIS": ["0501 - SAN PEDRO DE MACORIS ESTE","0502 - SAN PEDRO DE MACORIS OESTE","0503 - LA ROMANA","0504 - HATO MAYOR","0505 - SABANA DE LA MAR","0506 - CONSUELO","0507 - SAN JOSE DE LOS LLANOS","0508 - QUISQUEYA","0509 - EL VALLE","0510 - GUAYMATE","0511 - VILLA HERMOSA"],
+  "06 - LA VEGA": ["0601 - JOSE CONTRERAS","0602 - CONSTANZA","0603 - JARABACOA","0604 - LA VEGA OESTE","0605 - LA VEGA ESTE","0606 - MOCA","0607 - GASPAR HERNANDEZ","0608 - JAMAO AL NORTE","0609 - SAN VICTOR","0610 - JIMA ABAJO"],
+  "07 - SAN FRANCISCO DE MACORIS": ["0701 - TENARES","0702 - SALCEDO","0703 - CASTILLO","0704 - VILLA RIVA","0705 - SAN FRANCISCO DE MACORIS SUR-E","0706 - SAN FRANCISCO DE MACORIS NOR-O","0707 - VILLA TAPIA"],
+  "08 - SANTIAGO": ["0801 - SAN JOSE DE LAS MATAS","0802 - JANICO","0803 - SANTIAGO SUR-ESTE","0804 - SANTIAGO NOROESTE","0805 - SANTIAGO CENTRO-OESTE","0806 - SANTIAGO NORESTE","0807 - VILLA BISONO","0808 - LICEY AL MEDIO","0809 - TAMBORIL","0810 - VILLA GONZALEZ"],
+  "09 - MAO": ["0901 - MAO","0902 - ESPERANZA","0903 - SAN IGNACIO DE SABANETA","0904 - MONCION","0905 - LAGUNA SALADA","0906 - VILLA LOS ALMACIGOS"],
+  "10 - SANTO DOMINGO": ["1001 - VILLA MELLA","1002 - SABANA PERDIDA","1003 - SANTO DOMINGO NORESTE","1004 - SANTO DOMINGO ORIENTAL","1005 - BOCA CHICA","1006 - MENDOZA","1007 - SAN ANTONIO DE GUERRA"],
+  "11 - PUERTO PLATA": ["1101 - SOSUA","1102 - PUERTO PLATA","1103 - IMBERT","1104 - LUPERON","1105 - ALTAMIRA","1106 - EL MAMEY","1107 - VILLA ISABELA"],
+  "12 - HIGUEY": ["1201 - HIGUEY","1202 - SAN RAFAEL DEL YUMA","1203 - EL SEIBO","1204 - MICHES"],
+  "13 - MONTE CRISTI": ["1301 - MONTE CRISTI","1302 - GUAYUBIN","1303 - VILLA VASQUEZ","1304 - DAJABON","1305 - LOMA DE CABRERA","1306 - RESTAURACION"],
+  "14 - NAGUA": ["1401 - NAGUA","1402 - CABRERA","1403 - RIO SAN JUAN","1404 - SAMANA","1405 - SANCHEZ","1406 - EL FACTOR","1407 - LAS TERRENAS"],
+  "15 - SANTO DOMINGO": ["1501 - LOS ALCARRIZOS","1502 - SANTO DOMINGO CENTRO","1503 - SANTO DOMINGO SURCENTRAL","1504 - SANTO DOMINGO NOROESTE","1505 - HERRERA","1506 - PEDRO BRAND"],
+  "16 - COTUI": ["1601 - COTUI","1602 - FANTINO","1603 - CEVICOS","1604 - BONAO SUROESTE","1605 - PIEDRA BLANCA","1606 - BONAO NORDESTE","1607 - VILLA LA MATA"],
+  "17 - MONTE PLATA": ["1701 - YAMASA","1702 - MONTE PLATA","1703 - BAYAGUANA","1704 - SABANA GRANDE DE BOYA","1705 - PERALVILLO"],
+  "18 - BAHORUCO": ["1801 - NEIBA","1802 - TAMAYO","1803 - VILLA JARAGUA","1804 - JIMANI","1805 - DUVERGE"]
+};
+
+const regionalSelect = document.getElementById("regional");
+const distritoSelect = document.getElementById("distrito");
+
+document.addEventListener("DOMContentLoaded", function() {
+  cargarRegionales();
+  crearPersonas("facilitadores_sede1", "Facilitador", 4);
+  crearPersonas("colaboradores_sede1", "Colaborador", 4);
+  document.getElementById("year").textContent = new Date().getFullYear();
+});
+
+function cargarRegionales() {
+  Object.keys(catalogoDistritos).forEach(regional => {
+    const option = document.createElement("option");
+    option.value = regional;
+    option.textContent = regional;
+    regionalSelect.appendChild(option);
+  });
+}
+
+regionalSelect.addEventListener("change", function() {
+  distritoSelect.innerHTML = '<option value="">Seleccione un distrito</option>';
+
+  const regional = regionalSelect.value;
+
+  if (!regional || !catalogoDistritos[regional]) {
+    distritoSelect.disabled = true;
+    return;
+  }
+
+  catalogoDistritos[regional].forEach(distrito => {
+    const option = document.createElement("option");
+    option.value = distrito;
+    option.textContent = distrito;
+    distritoSelect.appendChild(option);
+  });
+
+  distritoSelect.disabled = false;
+});
+
+function crearPersonas(contenedorId, titulo, cantidad) {
+  const contenedor = document.getElementById(contenedorId);
+
+  for (let i = 1; i <= cantidad; i++) {
+    const div = document.createElement("div");
+    div.className = "persona";
+
+    div.innerHTML = `
+      <h4>${titulo} ${i}</h4>
+
+      <label>Nombre completo</label>
+      <input type="text" required>
+
+      <label>Cédula</label>
+      <input type="text" required placeholder="000-0000000-0">
+
+      <label>Teléfono</label>
+      <input type="tel" required>
+
+      <label>Centro educativo donde labora</label>
+      <input type="text" required>
+    `;
+
+    contenedor.appendChild(div);
+  }
+}
+
+function obtenerPersonas(contenedorId) {
+  const personas = [];
+  const bloques = document.querySelectorAll(`#${contenedorId} .persona`);
+
+  bloques.forEach(bloque => {
+    const inputs = bloque.querySelectorAll("input");
+
+    personas.push({
+      nombre: inputs[0].value.trim(),
+      cedula: inputs[1].value.trim(),
+      telefono: inputs[2].value.trim(),
+      centroLabora: inputs[3].value.trim()
+    });
+  });
+
+  return personas;
+}
+
+document.getElementById("formulario").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const facilitadores = obtenerPersonas("facilitadores_sede1");
+  const colaboradores = obtenerPersonas("colaboradores_sede1");
+
+  const payload = {
+    regional: regionalSelect.value,
+    distrito: distritoSelect.value,
+    responsable: document.getElementById("responsable").value.trim(),
+    telefono: document.getElementById("telefono").value.trim(),
+    correo: document.getElementById("correo").value.trim(),
+    sedes: [
+      {
+        tipoSede: "Principal",
+        centroSede: document.getElementById("sede1Centro").value.trim(),
+        cantidadEstudiantes: "",
+        cantidadGrupos: "",
+        observaciones: document.getElementById("observaciones").value.trim(),
+        coordinador: {
+          nombre: document.getElementById("sede1CoordNombre").value.trim(),
+          cedula: document.getElementById("sede1CoordCedula").value.trim(),
+          telefono: document.getElementById("sede1CoordTelefono").value.trim()
+        },
+        facilitadores: facilitadores,
+        colaboradores: colaboradores
+      }
+    ]
+  };
+
+  enviarDatos(payload);
+});
+
+function enviarDatos(payload) {
+  const btnEnviar = document.getElementById("btnEnviar");
+
+  btnEnviar.disabled = true;
+  btnEnviar.textContent = "Enviando...";
+
+  const formData = new FormData();
+  formData.append("payload", JSON.stringify(payload));
+
+  fetch(URL_APPS_SCRIPT, {
+    method: "POST",
+    mode: "no-cors",
+    body: formData
+  })
+  .then(() => {
+    mostrarMensaje("Información enviada. Verifique el registro en la hoja de cálculo.", "ok");
+    reiniciarFormulario();
+  })
+  .catch(error => {
+    console.error(error);
+    mostrarMensaje("No se pudo enviar la información.", "error");
+  })
+  .finally(() => {
+    btnEnviar.disabled = false;
+    btnEnviar.textContent = "Enviar información";
+  });
+}
+
+function reiniciarFormulario() {
+  document.getElementById("formulario").reset();
+
+  distritoSelect.innerHTML = '<option value="">Seleccione primero una regional</option>';
+  distritoSelect.disabled = true;
+}
+
+function mostrarMensaje(texto, tipo) {
+  const mensaje = document.getElementById("mensaje");
+  mensaje.textContent = texto;
+  mensaje.className = "mensaje " + tipo;
+  mensaje.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+</script>
+
+</body>
+</html>
