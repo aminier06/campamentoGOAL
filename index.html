@@ -383,7 +383,7 @@ function enviarDatos(payload) {
     body: formData
   })
   .then(() => {
-    mostrarMensaje("Información enviada. Verifique el registro en la hoja de cálculo.", "ok");
+    mostrarMensaje("Centro sede registrado.", "ok");
     reiniciarFormulario();
   })
   .catch(error => {
